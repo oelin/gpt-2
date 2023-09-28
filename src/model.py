@@ -71,9 +71,10 @@ class GPT2MultiHeadAttention(nn.Module):
 class GPT2MLP(nn.Module):
 
   def __init__(self, configuration: GPT2Configuration) -> None:
+    super().__init__()
     
     self.linear0 = nn.Linear(configuration.decoder_dimension, configuration.decoder_dimension * 4)
-    self.linear1 = nn.Linear(configuration.decoder_dimension * 4, configuration.decoder_dimensoin)
+    self.linear1 = nn.Linear(configuration.decoder_dimension * 4, configuration.decoder_dimension)
   
   def forward(self, x: torch.Tensor) -> torch.Tensor:
     
@@ -81,4 +82,24 @@ class GPT2MLP(nn.Module):
     x = F.relu(x)
     x = self.linear1(x)
     
+    return x
+
+
+class GPT2Decoder(nn.Module):
+
+  def __init__(self, configuration: GPT2Configuration) -> None:
+    super().__init__()
+
+    self.multi_head_attention = GPT2MultiHeadAttention(configuration)
+    self.mlp = GPT2MLP(configuration)
+    self.layer_normalization_0 = nn.LayerNorm(normalized_shape=configuration.decoder_dimension)
+    self.layer_normalization_1 = nn.LayerNorm(normalized_shape=configuration.decoder_dimension)
+  
+  def forward(self, x: torch.Tensor, mask: torch.Tensor) -> torch.Tensor:
+
+    x = x + self.multi_head_attention(x, mask)
+    x = self.layer_normalization_0(x)
+    x = x + self.mlp(x)
+    x = self.layer_normalization_1(x)
+
     return x
