@@ -5,6 +5,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from . configuration import GPT2Configuration
+
 
 class GPT2Embedder(nn.Module):
 
