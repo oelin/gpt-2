@@ -66,3 +66,19 @@ class GPT2MultiHeadAttention(nn.Module):
     x = self.linear0(x)
 
     return x
+
+
+class GPT2MLP(nn.Module):
+
+  def __init__(self, configuration: GPT2Configuration) -> None:
+    
+    self.linear0 = nn.Linear(configuration.decoder_dimension, configuration.decoder_dimension * 4)
+    self.linear1 = nn.Linear(configuration.decoder_dimension * 4, configuration.decoder_dimensoin)
+  
+  def forward(self, x: torch.Tensor) -> torch.Tensor:
+    
+    x = self.linear0(x)
+    x = F.relu(x)
+    x = self.linear1(x)
+    
+    return x
